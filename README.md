@@ -1,4 +1,4 @@
-# RomFS_Explorer
+# RomFS Explorer
 RomFS file explorer and dumper
 
 This is a small homebrew application, initially made for personal use, for listing and extracting files from a mounted romfs drive.
@@ -11,3 +11,8 @@ FEATURES:
 
 TODO:
 - Allow multiple romfs mounts
+
+THANKS:
+- neobrain for braindump.
+- mtheall for all of his romfs related work on ctrulib.
+- yellows8, smea, fincs, etc. for their work on ctrulib.
