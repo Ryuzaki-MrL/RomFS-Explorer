@@ -197,7 +197,7 @@ void sortFileList(std::vector<filedata> *filelist) {
 bool isDirectory(std::string path) {
     bool result = false;
     DIR *dir = opendir(path.c_str());
-    if (dir != NULL) result = true;
+    if (dir) result = true;
     closedir(dir);
     return result;
 }
