@@ -232,8 +232,7 @@ bool fileExists(std::string fname) {
     if (FILE *file = fopen(fname.c_str(), "r")) {
         fclose(file);
         return true;
-    }
-    else return false;
+    } else return false;
 }
 
 void printFiles(u32 cursor, u32 scroll, u32 count, std::vector<filedata> *files, std::string curdir) {
@@ -259,8 +258,7 @@ void printFiles(u32 cursor, u32 scroll, u32 count, std::vector<filedata> *files,
         if (len > 38) {
             if ((*files)[i+scroll].isDir) printf("\x1b[%lu;2H\x1b[33m%.35s...\x1b[0m", 2 + i, (*files)[i+scroll].name.c_str());
             else printf("\x1b[%lu;2H%.35s...", 2 + i, (*files)[i+scroll].name.c_str());
-        }
-        else {
+        } else {
             if ((*files)[i+scroll].isDir) printf("\x1b[%lu;2H\x1b[33m%-38s\x1b[0m", 2 + i, (*files)[i+scroll].name.c_str());
             else printf("\x1b[%lu;2H%-38s", 2 + i, (*files)[i+scroll].name.c_str());
         }
@@ -299,37 +297,37 @@ bool copyClipboard(std::vector<filedata> *source, std::string dest) {
                 mkdir((dest + (*source)[i].name).c_str(), 0777);
                 copyClipboard(&contents, dest + (*source)[i].name + "/");
             }
-        }
-        else {
+        } else {
             bool exists = fileExists(dest + (*source)[i].name);
-            FILE *dst = fopen((dest + (*source)[i].name).c_str(), "wb");
-            FILE *src = fopen((*source)[i].path.c_str(), "rb");
             size_t fsize = (*source)[i].size;
             size_t size = 0;
             if (exists && !(promptConfirm("Overwrite file " + (*source)[i].name + "?")));
-            else if (src && dst) {
-                consoleSelect(&top);
-                consoleClear();
-                printf("\x1b[14;%uHCopying %.42s", (25 - ((*source)[i].path.size() / 2)), (*source)[i].path.c_str());
-                gfxFlushBuffers();
-                gfxSwapBuffers();
-                gspWaitForVBlank();
-                char *buffer = (char*)malloc(0x50000);
-                while (!feof(src)) {
-                    size_t rsize = fread(buffer, 1, 0x50000, src);
-                    if (rsize==0) { promptError("Error reading file."); break; }
-                    size += fwrite(buffer, 1, rsize, dst);
-                    printf("\x1b[15;12H%zu b / %zu b (%zu%%)", size, fsize, (size * 100) / fsize);
+            else {
+                FILE *dst = fopen((dest + (*source)[i].name).c_str(), "wb");
+                FILE *src = fopen((*source)[i].path.c_str(), "rb");
+                if (src && dst) {
+                    consoleSelect(&top);
+                    consoleClear();
+                    printf("\x1b[14;%uHCopying %.42s", (25 - ((*source)[i].path.size() / 2)), (*source)[i].path.c_str());
                     gfxFlushBuffers();
                     gfxSwapBuffers();
                     gspWaitForVBlank();
+                    char *buffer = (char*)malloc(0x50000);
+                    while (!feof(src)) {
+                        size_t rsize = fread(buffer, 1, 0x50000, src);
+                        if (rsize==0) { promptError("Error reading file."); break; }
+                        size += fwrite(buffer, 1, rsize, dst);
+                        printf("\x1b[15;12H%zu b / %zu b (%zu%%)", size, fsize, (size * 100) / fsize);
+                        gfxFlushBuffers();
+                        gfxSwapBuffers();
+                        gspWaitForVBlank();
+                    }
+                    if (size < fsize) promptError("Error copying file.");
                 }
-                if (size < fsize) promptError("Error copying file.");
                 fclose(src);
                 fclose(dst);
                 free(buffer);
-            }
-            else promptError("Error opening file.");
+            } else promptError("Error opening file.");
         }
         source->pop_back();
     }
@@ -456,8 +454,7 @@ int main(int argc, char **argv) {
                 if (count < 28) {
                     if (cursor < count) cursor++;
                     else cursor=0;
-                }
-                else if (count > 0) {
+                } else if (count > 0) {
                     if (cursor<14) cursor++;
                     else if ((cursor + scroll) < (count - 14)) scroll++;
                     else if (cursor<28) cursor++;
@@ -488,8 +485,7 @@ int main(int argc, char **argv) {
                     easteregg[0]++;
                     if (easteregg[0]>=30) promptError("THE ROMFS IS NOT FUCKING MOUNTED!");
                     else promptError("RomFS not mounted.");
-                }
-                else {
+                } else {
                     printf("\x1b[%lu;0H  ", 1 + cursor);
                     selected = true;
                     source = cursor;
@@ -500,8 +496,7 @@ int main(int argc, char **argv) {
                     consoleClear();
                     printFiles(cursor, scroll, count, &filelist, curdir);
                 }
-            }
-            else {
+            } else {
                 if (cursor > 0) {
                     if (filelist[cursor+scroll-1].isDir) {
                         innerpath.push(curdir);
@@ -510,8 +505,7 @@ int main(int argc, char **argv) {
                         printf("\x1b[%lu;0H  ", 1 + cursor);
                         cursor = 0; scroll = 0; count = filelist.size();
                         printFiles(cursor, scroll, count, &filelist, curdir);
-                    }
-                    else if (source==0) {
+                    } else if (source==0) {
                         if (promptConfirm("Mount romFS from this file?")) {
                             u32 magic = 0x0;
                             FSUSER_OpenFileDirectly(&romfs_handle, ARCHIVE_SDMC, (FS_Path){PATH_EMPTY, 1, (u8*)""}, (FS_Path)fsMakePath(PATH_ASCII, (curdir + filelist[cursor+scroll-1].name).c_str()), FS_OPEN_READ, 0);
@@ -523,12 +517,10 @@ int main(int argc, char **argv) {
                                 Result res = romfsInitFromFile(romfs_handle, 0x1000);
                                 if (res!=0) promptError("Couldn't not mount romFS from file.");
                                 else mounted = true;
-                            }
-                            else promptError("Not a valid romFS file.");
+                            } else promptError("Not a valid romFS file.");
                         }
                     }
-                }
-                else {
+                } else {
                     if (curdir!=root[source]) {
                         curdir = innerpath.top();
                         innerpath.pop();
@@ -551,8 +543,7 @@ int main(int argc, char **argv) {
                             if (clipboard[i].path == (curdir + filelist[cursor+scroll-1].name)) {
                                 clipboard.erase(clipboard.begin()+i);
                                 break;
-                            }
-                            else if (i == (cbsize-1)) {
+                            } else if (i == (cbsize-1)) {
                                 if (cbsize < 30) clipboard.push_back(filelist[cursor+scroll-1]);
                                 else promptError("Clipboard full.");
                                 break;
@@ -560,13 +551,11 @@ int main(int argc, char **argv) {
                         }
                         if (cbsize==0) clipboard.push_back(filelist[cursor+scroll-1]);
                         printClipboard(&clipboard);
-                    }
-                    else {
+                    } else {
                         easteregg[1]++;
                         if ((easteregg[1]>=10) && promptConfirm("Copy files to this folder?")) promptError("Can't let you do that, Star Fox!");
                     }
-                }
-                else if (clipboard.size() > 0) {
+                } else if (clipboard.size() > 0) {
                     if (promptConfirm("Copy files to this folder?")) {
                         if (copyClipboard(&clipboard, curdir)) promptError("Copy done.");
                         else promptError("Copy failed.");
@@ -575,8 +564,7 @@ int main(int argc, char **argv) {
                         printFiles(cursor, scroll, count, &filelist, curdir);
                     }
                 }
-            }
-            else if ((cursor==1 && is3dsx) && (promptConfirm("Dump romfs to SD card?"))) {
+            } else if ((cursor==1 && is3dsx) && (promptConfirm("Dump romfs to SD card?"))) {
                 if (dumpRomFS()) promptError("RomFS dump done.");
                 else promptError("RomFS dump failed.");
             }
@@ -597,8 +585,7 @@ int main(int argc, char **argv) {
                 consoleSelect(&bot);
                 consoleClear();
                 printFiles(cursor, scroll, count, &filelist, curdir);
-            }
-            else selected = false;
+            } else selected = false;
             if (!selected) printSource(is3dsx, romfs_file, mounted);
         }
 
@@ -615,8 +602,7 @@ int main(int argc, char **argv) {
                 cursor = 0; scroll = 0;
                 romfsExit();
                 printSource(is3dsx, romfs_file, mounted);
-            }
-            else if ((!mounted && is3dsx) && (promptConfirm("Remount romFS from title?"))) {
+            } else if ((!mounted && is3dsx) && (promptConfirm("Remount romFS from title?"))) {
                 romfs_file = "";
                 getRomFSHandle(&romfs_handle);
                 mounted = (romfsInitFromFile(romfs_handle, 0x0)==0);
@@ -635,8 +621,7 @@ int main(int argc, char **argv) {
                     if (count < 28) {
                         if (cursor < count) cursor++;
                         else cursor=0;
-                    }
-                    else if (count > 0) {
+                    } else if (count > 0) {
                         if (cursor<14) cursor++;
                         else if ((cursor + scroll) < (count - 14)) scroll++;
                         else if (cursor<28) cursor++;
@@ -644,10 +629,8 @@ int main(int argc, char **argv) {
                     }
                     printFiles(cursor, scroll, count, &filelist, curdir);
                     timer=26;
-                }
-                else timer++;
-            }
-            else if (kHeld & KEY_UP) {
+                } else timer++;
+            } else if (kHeld & KEY_UP) {
                 if (timer>=30) {
                     printf("\x1b[%lu;0H  ", 1 + cursor);
                     if (cursor>13) cursor--;
@@ -659,10 +642,8 @@ int main(int argc, char **argv) {
                     }
                     printFiles(cursor, scroll, count, &filelist, curdir);
                     timer=26;
-                }
-                else timer++;
-            }
-            else timer = 0;
+                } else timer++;
+            } else timer = 0;
         }
 
         gfxFlushBuffers();
