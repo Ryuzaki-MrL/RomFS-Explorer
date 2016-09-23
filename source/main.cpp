@@ -323,11 +323,11 @@ bool copyClipboard(std::vector<filedata> *source, std::string dest) {
                         gspWaitForVBlank();
                     }
                     if (size < fsize) promptError("Error copying file.");
-                }
+                    free(buffer);
+                } else promptError("Error opening file.");
                 fclose(src);
                 fclose(dst);
-                free(buffer);
-            } else promptError("Error opening file.");
+            }
         }
         source->pop_back();
     }
