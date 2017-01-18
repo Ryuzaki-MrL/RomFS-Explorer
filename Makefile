@@ -20,39 +20,35 @@ SOURCE_DIRS := source
 
 EXTRA_OUTPUT_FILES :=
 
-LIBRARY_DIRS :=
-LIBRARIES :=
+LIBRARY_DIRS += $(DEVKITPRO)/libctru $(DEVKITPRO)/portlibs/armv6k
+LIBRARIES += ctru m
 
 BUILD_FLAGS :=
 RUN_FLAGS :=
 
-# 3DS/Wii U CONFIGURATION #
-
-ifeq ($(TARGET),$(filter $(TARGET),3DS WIIU))
-    TITLE := $(NAME)
-    DESCRIPTION := RomFS file explorer
-    AUTHOR := Ryuzaki_MrL
-endif
+VERSION_MAJOR := 1
+VERSION_MINOR := 0
+VERSION_MICRO := 1
 
 # 3DS CONFIGURATION #
 
-ifeq ($(TARGET),3DS)
-    LIBRARY_DIRS += $(DEVKITPRO)/libctru $(DEVKITPRO)/portlibs/armv6k
-    LIBRARIES += ctru m
+TITLE := $(NAME)
+DESCRIPTION := RomFS file explorer
+AUTHOR := Ryuzaki_MrL
 
-    PRODUCT_CODE := CTR-HB-ROMF
-    UNIQUE_ID := 0xA1B2C
+PRODUCT_CODE := CTR-HB-ROMF
+UNIQUE_ID := 0xA1B2C
 
-    SYSTEM_MODE := 64MB
-    SYSTEM_MODE_EXT := Legacy
+SYSTEM_MODE := 64MB
+SYSTEM_MODE_EXT := Legacy
 
-    ICON_FLAGS :=
+ICON_FLAGS :=
 
-    ROMFS_DIR := 
-    BANNER_AUDIO := meta/audio.cwav
-    BANNER_IMAGE := meta/banner.png
-    ICON := meta/icon.png
-endif
+ROMFS_DIR := 
+BANNER_AUDIO := meta/audio.cwav
+BANNER_IMAGE := meta/banner.png
+ICON := meta/icon.png
+LOGO := meta/logo.bcma.lz
 
 # INTERNAL #
 
