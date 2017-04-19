@@ -367,20 +367,21 @@ bool dumpRomFS() {
     else {
         u64 id = 0;
         APT_GetProgramID(&id);
-        char fname[26];
-        sprintf(fname, "/%016llx.romfs", id);
-        bool exists = fileExists(std::string(fname));
+        char fname[25];
+        char fpath[51];
+        sprintf(fname, "%016llx.romfs", id);
+        sprintf(fpath, "/3ds/data/romfs_explorer/%s", fname);
+        bool exists = fileExists(std::string(fpath));
         u64 fsize = 0;
         u64 offset = 0;
         FSFILE_GetSize(file_handle, &fsize);
-        if (exists && !(promptConfirm("Overwrite file " + std::string(fname) + "?")));
-        else {
+        if (!exists || promptConfirm("Overwrite file " + std::string(fname) + "?")) {
             consoleSelect(&top);
             consoleClear();
             printf("\x1b[14;18HDumping romfs");
             char header[0x1000] = "IVFC";
             memset(header + 4, 0, 0xFFC);
-            FILE *dst = fopen(fname, "wb");
+            FILE *dst = fopen(fpath, "wb");
             fwrite(header, 1, 0x1000, dst);
             char *buffer = (char*)malloc(0x100000);
             u32 bufsiz = 0x100000;
@@ -430,6 +431,9 @@ int main(int argc, char **argv) {
     std::stack<std::string> innerpath;
     std::vector<filedata> filelist;
     std::vector<filedata> clipboard;
+    mkdir("/3ds", 0777);
+    mkdir("/3ds/data", 0777);
+    mkdir("/3ds/data/romfs_explorer", 0777);
 
     // romFS initialization
     is3dsx = getRomFSHandle(&romfs_handle);
